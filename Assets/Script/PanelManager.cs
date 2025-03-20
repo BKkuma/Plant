@@ -11,41 +11,43 @@ public class PanelManager : MonoBehaviour
 
     void Start()
     {
-        ShowPanel(null);
+        // ไม่ต้องปิดทุก Panel ตั้งแต่เริ่ม
+        CloseAllPanels();
     }
 
     public void ShowPanel(GameObject panel)
+    {
+        // กรณีปิด FarmPanel
+        if (panel == farmPanel)
+        {
+            bool isActive = farmPanel.activeSelf;
+            farmPanel.SetActive(!isActive);
+            farmManager.SetFarmGridActive(!isActive);
+            if (seedUI != null) seedUI.SetActive(!isActive);
+            return;
+        }
+
+        // กรณีปิด PuzzlePanel
+        if (panel == puzzlePanel)
+        {
+            PuzzleGridManager puzzleManager = FindObjectOfType<PuzzleGridManager>();
+            if (puzzleManager != null)
+            {
+                puzzleManager.TogglePuzzleGrid();
+            }
+            return;
+        }
+
+        // ปิดทุก Panel แล้วเปิด Panel ที่ต้องการ
+        CloseAllPanels();
+        if (panel != null) panel.SetActive(true);
+    }
+
+    void CloseAllPanels()
     {
         farmPanel?.SetActive(false);
         puzzlePanel?.SetActive(false);
         shopPanel?.SetActive(false);
         inventoryPanel?.SetActive(false);
-
-        if (panel != null)
-        {
-            panel.SetActive(true);
-
-            // ✅ ถ้าเป็น FarmPanel ให้เปิดฟาร์ม & แสดงพืช
-            if (farmManager != null)
-            {
-                farmManager.SetFarmGridActive(panel == farmPanel);
-            }
-
-            if (seedUI != null)
-            {
-                seedUI.SetActive(panel == farmPanel); // แสดง Seed UI เฉพาะตอนเปิด Farm Panel
-            }
-
-        }
-        else
-        {
-            // ✅ ถ้าไม่มี Panel ให้ซ่อนพืช
-            if (farmManager != null)
-            {
-                farmManager.SetFarmGridActive(false);
-
-            }
-            if (seedUI != null) seedUI.SetActive(false);
-        }
     }
 }
